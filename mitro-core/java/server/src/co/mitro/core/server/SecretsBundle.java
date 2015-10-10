@@ -18,7 +18,7 @@
  *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *     
+ *
  *     You can contact the authors at inbound@mitro.co.
  *******************************************************************************/
 package co.mitro.core.server;
@@ -37,74 +37,84 @@ import org.slf4j.LoggerFactory;
 
 import co.mitro.keyczar.Util;
 
-/** Contains all secrets for the Mitro Core server. */
+/**
+ * Contains all secrets for the Mitro Core server.
+ */
 public class SecretsBundle {
-  private static final Logger logger = LoggerFactory.getLogger(SecretsBundle.class);
-  private static final String SIGNING_RELATIVE_PATH = "sign_keyczar";
+    private static final Logger logger = LoggerFactory.getLogger(SecretsBundle.class);
+    private static final String SIGNING_RELATIVE_PATH = "sign_keyczar";
 
-  private final Signer signingKey;
+    private final Signer signingKey;
 
-  /** Loads secrets from path. */
-  public SecretsBundle(String path) {
-    String subPathString = new File(path, SIGNING_RELATIVE_PATH).getPath();
-    logger.info("loading signing key from {}", subPathString);
-    try {
-      signingKey = new Signer(new KeyczarFileReader(subPathString));
-    } catch (KeyczarException e) {
-      throw new RuntimeException("Unable to load signing key", e);
-    }
-  }
-
-  private SecretsBundle(Signer signingKey) {
-    this.signingKey = checkNotNull(signingKey);
-  }
-
-  /** Returns the signature for input, using the signing key. */
-  public String signToken(String input) throws KeyczarException {
-    return signingKey.sign(input);
-  }
-
-  /**
-   * Returns true if signature is valid for data, using the signing key. Keyczar throws exceptions
-   * for many cases of malformed signatures, but this instead returns false.
-   */
-  public boolean verifyToken(String data, String signature) {
-    if (signature.length() == 0) {
-      // throws ArrayIndexOutOfBoundsException with current Keyczar
-      return false;
+    /**
+     * Loads secrets from path.
+     */
+    public SecretsBundle(String path) {
+        String subPathString = new File(path, SIGNING_RELATIVE_PATH).getPath();
+        logger.info("loading signing key from {}", subPathString);
+        try {
+            signingKey = new Signer(new KeyczarFileReader(subPathString));
+        } catch (KeyczarException e) {
+            throw new RuntimeException("Unable to load signing key", e);
+        }
     }
 
-    try {
-      return signingKey.verify(data, signature);
-    } catch (KeyczarException e) {
-      // thrown if input length, version, or key doesn't match.
-      return false;
+    private SecretsBundle(Signer signingKey) {
+        this.signingKey = checkNotNull(signingKey);
     }
-  }
 
-  /** Returns a new SecretsBundle with random test secrets. */
-  public static SecretsBundle generateForTest() {
-    try {
-      Signer signer = new Signer(Util.generateKeyczarReader(
-          DefaultKeyType.HMAC_SHA1, KeyPurpose.SIGN_AND_VERIFY));
-      return new SecretsBundle(signer);
-    } catch (KeyczarException e) {
-      throw new RuntimeException("Error generating signing key", e);
+    /**
+     * Returns the signature for input, using the signing key.
+     */
+    public String signToken(String input) throws KeyczarException {
+        return signingKey.sign(input);
     }
-  }
 
-  /** Signs a string using a SecretBundle. Used to debug a token signature verification error. */
-  public static void main(String[] arguments) throws KeyczarException {
-    if (arguments.length != 2) {
-      System.err.println("SecretsBundle (path) (string to sign)");
-      System.exit(1);
+    /**
+     * Returns true if signature is valid for data, using the signing key. Keyczar throws exceptions
+     * for many cases of malformed signatures, but this instead returns false.
+     */
+    public boolean verifyToken(String data, String signature) {
+        if (signature.length() == 0) {
+            // throws ArrayIndexOutOfBoundsException with current Keyczar
+            return false;
+        }
+
+        try {
+            return signingKey.verify(data, signature);
+        } catch (KeyczarException e) {
+            // thrown if input length, version, or key doesn't match.
+            return false;
+        }
     }
-    String secretsPath = arguments[0];
-    String data = arguments[1];
 
-    System.out.println("Signing string: " + data);
-    SecretsBundle secrets = new SecretsBundle(secretsPath);
-    String signature = secrets.signToken(data);
-    System.out.println("Signature: " + signature);
-  }
+    /**
+     * Returns a new SecretsBundle with random test secrets.
+     */
+    public static SecretsBundle generateForTest() {
+        try {
+            Signer signer = new Signer(Util.generateKeyczarReader(
+                    DefaultKeyType.HMAC_SHA1, KeyPurpose.SIGN_AND_VERIFY));
+            return new SecretsBundle(signer);
+        } catch (KeyczarException e) {
+            throw new RuntimeException("Error generating signing key", e);
+        }
+    }
+
+    /**
+     * Signs a string using a SecretBundle. Used to debug a token signature verification error.
+     */
+    public static void main(String[] arguments) throws KeyczarException {
+        if (arguments.length != 2) {
+            System.err.println("SecretsBundle (path) (string to sign)");
+            System.exit(1);
+        }
+        String secretsPath = arguments[0];
+        String data = arguments[1];
+
+        System.out.println("Signing string: " + data);
+        SecretsBundle secrets = new SecretsBundle(secretsPath);
+        String signature = secrets.signToken(data);
+        System.out.println("Signature: " + signature);
+    }
 }
