@@ -26,6 +26,7 @@ package co.mitro.core.server;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.File;
+import java.nio.file.Paths;
 
 import org.keyczar.DefaultKeyType;
 import org.keyczar.KeyczarFileReader;
@@ -51,6 +52,10 @@ public class SecretsBundle {
      */
     public SecretsBundle(String path) {
         String subPathString = new File(path, SIGNING_RELATIVE_PATH).getPath();
+
+        //TODO delete
+        System.out.println("PATH:"+Paths.get(subPathString).toAbsolutePath().toString());
+        
         logger.info("loading signing key from {}", subPathString);
         try {
             signingKey = new Signer(new KeyczarFileReader(subPathString));
