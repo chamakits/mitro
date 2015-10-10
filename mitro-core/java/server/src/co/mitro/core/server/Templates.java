@@ -18,7 +18,7 @@
  *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *     
+ *
  *     You can contact the authors at inbound@mitro.co.
  *******************************************************************************/
 package co.mitro.core.server;
@@ -27,38 +27,52 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.file.Paths;
 
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.google.common.base.Charsets;
 
-/** Utilities for rendering Mustache templates. */
+/**
+ * Utilities for rendering Mustache templates.
+ */
 public class Templates {
-  private static final ResourceMustacheFactory MUSTACHE_FACTORY = new ResourceMustacheFactory();
+    private static final ResourceMustacheFactory MUSTACHE_FACTORY = new ResourceMustacheFactory();
 
-  // Currently just a utility class (not constructible)
-  private Templates() {}
-
-  /** Searches for Mustache templates as Java resources relative to this class. */
-  public static class ResourceMustacheFactory extends DefaultMustacheFactory {
-    @Override
-    public Reader getReader(String resourceName) {
-      InputStream is = getClass().getResourceAsStream(resourceName);
-      if (is != null) {
-        return new BufferedReader(new InputStreamReader(is, Charsets.UTF_8));
-      }
-      return super.getReader(resourceName);
+    // Currently just a utility class (not constructible)
+    private Templates() {
     }
 
-    /** Compiles the Mustache template from the resource templateName, relative to packageClass. */
-    public Mustache compilePackageRelative(Class<?> packageClass, String templateName) {
-      String packagePath = packageClass.getPackage().getName().replace('.', '/') + "/";
-      return compile(packagePath + templateName);
-    }
-  }
+    /**
+     * Searches for Mustache templates as Java resources relative to this class.
+     */
+    public static class ResourceMustacheFactory extends DefaultMustacheFactory {
+        @Override
+        public Reader getReader(String resourceName) {
+            InputStream is = getClass().getResourceAsStream(resourceName);
+            if (is != null) {
+                return new BufferedReader(new InputStreamReader(is, Charsets.UTF_8));
+            }
+            return super.getReader(resourceName);
+        }
 
-  /** Compiles the template from Java resource templateName, relative to this class. */
-  public static Mustache compile(String templateName) {
-    return MUSTACHE_FACTORY.compilePackageRelative(Templates.class, templateName);
-  }
+        /**
+         * Compiles the Mustache template from the resource templateName, relative to packageClass.
+         */
+        public Mustache compilePackageRelative(Class<?> packageClass, String templateName) {
+            String packagePath = packageClass.getPackage().getName().replace('.', '/') + "/";
+
+            //TODO delete
+            System.out.println("PATH:" + Paths.get(packagePath).toAbsolutePath().toString());
+
+            return compile(packagePath + templateName);
+        }
+    }
+
+    /**
+     * Compiles the template from Java resource templateName, relative to this class.
+     */
+    public static Mustache compile(String templateName) {
+        return MUSTACHE_FACTORY.compilePackageRelative(Templates.class, templateName);
+    }
 }

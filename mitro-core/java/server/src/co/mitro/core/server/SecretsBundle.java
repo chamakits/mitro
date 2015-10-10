@@ -55,7 +55,7 @@ public class SecretsBundle {
 
         //TODO delete
         System.out.println("PATH:"+Paths.get(subPathString).toAbsolutePath().toString());
-        
+
         logger.info("loading signing key from {}", subPathString);
         try {
             signingKey = new Signer(new KeyczarFileReader(subPathString));

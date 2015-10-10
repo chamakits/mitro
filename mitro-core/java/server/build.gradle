@@ -81,7 +81,8 @@ dependencies {
     compile 'com.codahale.metrics:metrics-servlets:3.0.0-BETA3'
 
     //compile 'com.github.spullara.mustache.java:mustache.java:0.8.13'
-    compile 'com.github.spullara.mustache.java:compiler:0.8.13'
+//    compile 'com.github.spullara.mustache.java:compiler:0.8.13'
+    compile 'com.github.spullara.mustache.java:compiler:0.8.17'
     compile 'com.j256.ormlite:ormlite-core:4.45'
     compile 'com.j256.ormlite:ormlite-jdbc:4.45'
 
@@ -114,6 +115,10 @@ sourceSets {
     }
     test {
         java {
+            srcDir 'test'
+        }
+        resources {
+            srcDir keyResourcePath
             srcDir 'test'
         }
     }
