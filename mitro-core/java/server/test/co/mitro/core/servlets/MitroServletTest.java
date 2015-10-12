@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -123,6 +124,7 @@ public class MitroServletTest {
         // Create a new postgres DB
         Runtime runtime = Runtime.getRuntime();
         String[] args = {extraPath + INITDB, directoryPath};
+        System.out.println("ARGS:"+ Arrays.toString(args));
         Process initdb = runtime.exec(args);
 
         byte[] output = new byte[4096];
